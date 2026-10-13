@@ -1,0 +1,121 @@
+/* HomePage.css */
+.home {
+  width: min(1320px, 92%);
+  margin: 0 auto;
+  padding: 56px 0 72px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.hero h1 {
+  margin: 0 0 14px;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text, #111);
+}
+
+.hero p {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--muted, #555);
+}
+
+/* pills */
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.pill {
+  padding: 10px 20px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--header-bg, #fff);
+  color: var(--text, #111);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pill:hover { border-color: var(--text, #111); }
+
+.pill.active {
+  background: var(--text, #111);
+  border-color: var(--text, #111);
+  color: var(--header-bg, #fff);
+}
+
+/* grid */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  scroll-margin-top: 90px;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  padding: 28px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--header-bg, #fff);
+  color: var(--text, #111);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.tool-card:hover {
+  border-color: var(--text, #111);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.tool-card:focus-visible {
+  outline: 2px solid var(--accent, #e5322d);
+  outline-offset: 3px;
+}
+
+.tool-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 22px;
+  border-radius: 14px;
+}
+
+.tool-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.tool-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted, #555);
+}
+
+@media (max-width: 600px) {
+  .home { padding: 36px 0 48px; }
+  .tool-card { min-height: 0; padding: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-card, .pill { transition: none; }
+  .tool-card:hover { transform: none; }
+}

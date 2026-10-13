@@ -1,0 +1,64 @@
+.pc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.pc-card {
+  padding: 24px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--header-bg, #fff);
+}
+
+.pc-card h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+
+.pc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted, #555);
+}
+
+.pc-field input {
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text, #111);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.pc-field input:focus-visible {
+  outline: 2px solid var(--accent, #e5322d);
+  outline-offset: 1px;
+}
+
+.pc-result {
+  display: block;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface, #f6f6f9);
+  color: var(--text, #111);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 400px) {
+  .pc-row {
+    grid-template-columns: 1fr;
+  }
+}

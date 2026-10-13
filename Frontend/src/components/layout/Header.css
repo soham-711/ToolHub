@@ -1,0 +1,116 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 28px;
+  background: var(--header-bg, #fff);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+/* brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text, #111);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent, #e5322d);
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+/* right side */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.header-actions > a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text, #111);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.header-actions > a:hover {
+  color: var(--accent, #e5322d);
+}
+
+/* theme switcher */
+.theme-switcher {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--surface, #f6f6f9);
+}
+
+.theme-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted, #555);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.theme-option:hover {
+  color: var(--text, #111);
+}
+
+.theme-option.active {
+  background: var(--text, #111);
+  color: var(--header-bg, #fff);
+}
+
+.theme-check {
+  margin-left: 2px;
+}
+
+/* mobile: icons only */
+@media (max-width: 720px) {
+  .site-header {
+    padding: 0 16px;
+  }
+  .header-actions {
+    gap: 14px;
+  }
+  .theme-option span {
+    display: none;
+  }
+  .theme-option {
+    padding: 8px;
+  }
+  .theme-check {
+    display: none;
+  }
+}

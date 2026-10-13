@@ -1,0 +1,275 @@
+# Everyday Utility Hub — Adding Categories and Tools
+
+A practical reference for extending the tool catalogue, adding categories, and connecting tools to category and tool routes.
+
+## Example: Add a “Converters” category with a “Length Converter” tool
+
+### Checklist
+
+1. Add the category ID to `Category` in `tools/types.ts`.
+2. Add the category to `tools/categories.ts`.
+3. Create the tool folder with `meta.ts`, `logic.ts`, `index.tsx`, and a CSS file.
+4. Register the tool in `tools/registry.ts`.
+5. Optionally add a footer link in `Footer.tsx`.
+
+After steps 1–4, the category pill, `/category/converters`, and `/tools/length-converter` routes should work, assuming the existing category and routing pages are implemented to read from the central category list and tool registry.
+
+---
+
+## 1. Add the category type
+
+File: `tools/types.ts`
+
+```ts
+export type Category =
+  | "calculators"
+  | "text"
+  | "date-time"
+  | "image"
+  | "pdf"
+  | "developer"
+  | "converters";
+```
+
+The new `"converters"` value is the category ID. Adding it to the union lets TypeScript check places where a `Category` value is required.
+
+## 2. Add the category metadata
+
+File: `tools/categories.ts`
+
+```ts
+import type { Category } from "./types";
+
+export const categories: { id: Category; label: string }[] = [
+  // ...existing categories
+  { id: "converters", label: "Converters" },
+];
+```
+
+- `id` is the URL segment, such as `/category/converters`.
+- `label` is the user-facing category name shown in the UI.
+
+Keep category IDs consistent everywhere. The ID in a tool's metadata must exactly match the ID in this list.
+
+## 3. Create the tool folder
+
+Create this folder structure:
+
+```text
+tools/
+└── converters/
+    └── length-converter/
+        ├── meta.ts
+        ├── logic.ts
+        ├── index.tsx
+        └── length-converter.css
+```
+
+### `meta.ts`
+
+```ts
+import { Ruler } from "lucide-react";
+import type { ToolMeta } from "../../types";
+
+export const meta: ToolMeta = {
+  slug: "length-converter",
+  title: "Length Converter",
+  desc: "Convert between meters, kilometers, miles, feet and inches.",
+  category: "converters",
+  Icon: Ruler,
+  color: "#0e9aa7",
+};
+```
+
+Notes:
+- `slug` determines the tool URL: `/tools/length-converter`.
+- `category` must match the category ID in `tools/categories.ts`.
+- `Icon` and `color` are presentation metadata used by the UI.
+
+### `logic.ts`
+
+```ts
+export const units = {
+  m: { label: "Meters", factor: 1 },
+  km: { label: "Kilometers", factor: 1000 },
+  mi: { label: "Miles", factor: 1609.344 },
+  ft: { label: "Feet", factor: 0.3048 },
+  in: { label: "Inches", factor: 0.0254 },
+} as const;
+
+export type Unit = keyof typeof units;
+
+export const convert = (value: number, from: Unit, to: Unit) =>
+  (value * units[from].factor) / units[to].factor;
+```
+
+This logic converts the input to a base unit (meters) and then converts it to the selected output unit.
+
+### `index.tsx`
+
+The tool component must have a **default export** because the registry loads it with `import()`.
+
+```tsx
+import { useState } from "react";
+import { convert, units, type Unit } from "./logic";
+import "./length-converter.css";
+
+function LengthConverter() {
+  const [value, setValue] = useState("");
+  const [from, setFrom] = useState<Unit>("m");
+  const [to, setTo] = useState<Unit>("ft");
+
+  const n = value.trim() === "" ? NaN : Number(value);
+  const result = Number.isFinite(n)
+    ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 6 }).format(
+        convert(n, from, to)
+      )
+    : "-";
+
+  const options = (Object.keys(units) as Unit[]).map((u) => (
+    <option key={u} value={u}>
+      {units[u].label}
+    </option>
+  ));
+
+  return (
+    <div className="lc">
+      <label className="lc-field">
+        <span>Value</span>
+        <input
+          type="number"
+          inputMode="decimal"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </label>
+
+      <label className="lc-field">
+        <span>From</span>
+        <select value={from} onChange={(e) => setFrom(e.target.value as Unit)}>
+          {options}
+        </select>
+      </label>
+
+      <label className="lc-field">
+        <span>To</span>
+        <select value={to} onChange={(e) => setTo(e.target.value as Unit)}>
+          {options}
+        </select>
+      </label>
+
+      <output className="lc-result" aria-live="polite">
+        {result}
+      </output>
+    </div>
+  );
+}
+
+export default LengthConverter;
+```
+
+### `length-converter.css`
+
+```css
+.lc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--header-bg, #fff);
+}
+
+.lc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted, #555);
+}
+
+.lc-field input,
+.lc-field select {
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text, #111);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.lc-result {
+  grid-column: 1 / -1;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface, #f6f6f9);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+```
+
+## 4. Register the tool
+
+File: `tools/registry.ts`
+
+The following is the registration pattern. Keep the existing imports and tools in your registry; add the new import and entry rather than replacing the entire registry.
+
+```tsx
+import { lazy } from "react";
+import { meta as lengthConverter } from "./converters/length-converter/meta";
+import type { Tool } from "./types";
+
+export const tools: Tool[] = [
+  // ...existing tool entries
+  {
+    ...lengthConverter,
+    Component: lazy(() => import("./converters/length-converter")),
+  },
+];
+```
+
+The `Tool` type must support the `Component` property and the fields used by `meta`. Adjust the import path if your registry or tool files live in a different folder.
+
+## 5. Optional footer link
+
+In `Footer.tsx`, add a link to the relevant footer group:
+
+```tsx
+{ label: "Converters", to: "/category/converters" },
+```
+
+The footer link is optional and is not required for the category or tool routes to work.
+
+## Adding another tool to an existing category
+
+If the category already exists, you generally only need to:
+
+1. Create the tool folder (`meta.ts`, `logic.ts`, `index.tsx`, and CSS).
+2. Register the tool in `tools/registry.ts`.
+
+Ensure the new tool's `meta.category` matches an existing category ID and its `meta.slug` matches the intended URL.
+
+## Common mistakes
+
+- **Blank page or lazy-loading error:** check that the tool component has `export default`.
+- **Tool missing from the category page:** verify `meta.category` exactly matches the category ID in `tools/categories.ts`.
+- **404 on the tool URL:** verify `slug` in `meta.ts` matches the route parameter and registry lookup.
+- **Category 404:** verify the category ID exists in `tools/categories.ts` and that the category route reads from this list.
+- **TypeScript error in the registry:** verify the `Tool` type includes the fields from `ToolMeta` and the lazy-loaded `Component`.
+- **Route still fails after registration:** verify the route definitions use the registry and handle unknown slugs/categories.
+
+## Final verification checklist
+
+- [ ] Category ID added to `tools/types.ts`.
+- [ ] Category added to `tools/categories.ts`.
+- [ ] Tool files created.
+- [ ] Tool metadata has the correct `slug` and `category`.
+- [ ] Tool has a default export.
+- [ ] Tool registered with `lazy(() => import(...))`.
+- [ ] Category and tool routes resolve.
+- [ ] Homepage/category listings show the new category/tool.
+- [ ] Footer link added if desired.
+- [ ] Test empty input, invalid input, and normal conversion results.
